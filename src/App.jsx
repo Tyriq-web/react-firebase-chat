@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
@@ -10,6 +9,7 @@ import {
 import {
   doc,
   setDoc,
+  updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
 
@@ -40,13 +40,18 @@ function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editPhotoUrl, setEditPhotoUrl] = useState("");
+  const [updatingProfile, setUpdatingProfile] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setAuthLoading(false);
     });
-
     return unsubscribe;
   }, []);
 
@@ -101,6 +106,7 @@ function App() {
     return unsubscribe;
   }, [activeConversation]);
 
+  // Fixed handleAuth
   async function handleAuth(event) {
     event.preventDefault();
     setError("");
@@ -137,11 +143,40 @@ function App() {
     }
   }
 
+  // Restored handleLogout
   async function handleLogout() {
     await signOut(auth);
     setActiveConversation(null);
     setActiveContact(null);
     setMessages([]);
+    setIsProfileMenuOpen(false);
+  }
+
+  // Fixed handleUpdateProfile
+  async function handleUpdateProfile(event) {
+    event.preventDefault();
+    setUpdatingProfile(true);
+    setError("");
+
+    try {
+      await updateProfile(user, {
+        displayName: editName.trim(),
+        photoURL: editPhotoUrl.trim() || null,
+      });
+
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        displayName: editName.trim(),
+        photoURL: editPhotoUrl.trim() || null,
+      });
+
+      setNotice("Profile updated successfully!");
+      setIsProfileModalOpen(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUpdatingProfile(false);
+    }
   }
 
   async function handleOpenChat(contact) {
@@ -286,13 +321,89 @@ function App() {
           </div>
         </div>
 
-        <div className="account-controls">
-          <span>{user.displayName || user.email}</span>
-          <button className="secondary-button" onClick={handleLogout}>
-            Sign out
+        {/* Fixed Header Controls */}
+        <div className="account-controls" style={{ position: "relative" }}>
+          <button
+            className="avatar-button"
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+          >
+            {user.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt="Profile"
+                className="avatar-img"
+                onError={(e) => {
+                  e.target.src = `https://ui-avatars.com/api/?name=${user.displayName || 'U'}&background=e9e7ff&color=5147cf`;
+                }}
+              />
+            ) : (
+              <div className="avatar">
+                {(user.displayName || user.email || "?").charAt(0).toUpperCase()}
+              </div>
+            )}
           </button>
+
+          {isProfileMenuOpen && (
+            <div className="profile-dropdown">
+              <button
+                onClick={() => {
+                  setIsProfileMenuOpen(false);
+                  setEditName(user.displayName || "");
+                  setEditPhotoUrl(user.photoURL || "");
+                  setIsProfileModalOpen(true);
+                }}
+              >
+                View Profile
+              </button>
+              <button onClick={handleLogout}>Sign out</button>
+            </div>
+          )}
         </div>
       </header>
+
+      {/* Profile Modal */}
+      {isProfileModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Edit Profile</h2>
+            <form onSubmit={handleUpdateProfile}>
+              <label>
+                Username
+                <input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="Enter your name"
+                  required
+                />
+              </label>
+              <label>
+                Profile Picture URL (Optional)
+                <input
+                  value={editPhotoUrl}
+                  onChange={(e) => setEditPhotoUrl(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                />
+              </label>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => setIsProfileModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="primary-button"
+                  disabled={updatingProfile}
+                >
+                  {updatingProfile ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {error && <div className="global-error">{error}</div>}
       {notice && <div className="global-notice">{notice}</div>}

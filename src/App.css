@@ -1,4 +1,3 @@
-
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
 
 :root {
@@ -241,7 +240,7 @@ p {
   border: 1px solid #e8e8f1;
   border-radius: 20px;
   background: white;
-  box-shadow: 0 18px 60px #29294a0a;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
 }
 
 .user-sidebar {
@@ -286,15 +285,24 @@ p {
   gap: 12px;
   width: 100%;
   padding: 15px 20px;
-  border: 0;
+  border: 1px solid transparent;
   border-top: 1px solid #f1f1f6;
   background: white;
   text-align: left;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin-bottom: 4px;
 }
 
-.user-item:hover,
+.user-item:hover {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  transform: translateY(-1px);
+}
+
 .user-item.selected {
-  background: #f3f2ff;
+  background-color: #f1f5f9;
+  border-left: 4px solid #8b5cf6;
 }
 
 .avatar {
@@ -321,7 +329,8 @@ p {
   font-size: 13px;
 }
 
-.user-details small {
+.person-info small {
+  display: none;
   overflow: hidden;
   color: #85859a;
   font-size: 11px;
@@ -389,6 +398,7 @@ p {
 }
 
 .conversation-header p {
+  display: none;
   margin: 0;
   color: #85859a;
   font-size: 12px;
@@ -402,6 +412,102 @@ p {
 
 .page-error {
   margin: 12px 0;
+}
+
+/* Message Area Layout */
+.messages-area {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fafafc;
+}
+
+.message-row {
+  display: flex;
+  width: 100%;
+}
+
+.message-own {
+  justify-content: flex-end;
+}
+
+.message-other {
+  justify-content: flex-start;
+}
+
+/* Modern Message Bubbles */
+.message-bubble {
+  max-width: 70%;
+  border-radius: 18px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.message-bubble p {
+  margin: 0;
+}
+
+.message-own .message-bubble {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.message-own .message-bubble small {
+  color: #eaddff;
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  text-align: right;
+}
+
+.message-other .message-bubble {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-bottom-left-radius: 4px;
+  color: #24243a;
+}
+
+.message-other .message-bubble small {
+  color: #85859a;
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+/* Message Input Form */
+.message-form {
+  display: flex;
+  gap: 12px;
+  padding: 20px 24px;
+  background: white;
+  border-top: 1px solid #ececf3;
+}
+
+.message-form input {
+  flex: 1;
+  padding: 13px 18px;
+  border: 1px solid #e4e5ef;
+  border-radius: 24px;
+  outline: none;
+  background: #f9f9fc;
+  color: #24243a;
+  caret-color: #6258e8;
+}
+
+.message-form input:focus {
+  border-color: #766ce9;
+  background: white;
+}
+
+.send-button {
+  border-radius: 24px;
+  padding: 12px 24px;
 }
 
 @media (max-width: 700px) {
@@ -448,4 +554,128 @@ p {
     display: none;
   }
 }
+/* Avatar Button & Profile Image */
+.avatar-button {
+  background: none;
+  border: none;
+  padding: 0;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
 
+.avatar-button:hover {
+  transform: scale(1.05);
+}
+
+.avatar-img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e9e7ff;
+}
+
+/* Dropdown Menu */
+.profile-dropdown {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.profile-dropdown button {
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+  color: #24243a;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.profile-dropdown button:last-child {
+  border-bottom: none;
+  color: #a52b40;
+}
+
+.profile-dropdown button:hover {
+  background: #f8fafc;
+}
+
+/* Modal Overlay & Content */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+.modal-content form {
+  display: grid;
+  gap: 16px;
+}
+
+.modal-content label {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #424259;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e4e5ef;
+  border-radius: 10px;
+  background: #f9f9fc;
+  outline: none;
+  color: #24243a;
+  caret-color: #6258e8;
+}
+
+.modal-content input:focus {
+  border-color: #766ce9;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.modal-actions .primary-button {
+  margin: 0;
+}
